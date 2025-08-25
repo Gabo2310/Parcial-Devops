@@ -1,30 +1,7 @@
-# Etapa 1: build
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM python:3.12-slim
 WORKDIR /app
-
-# Copiar todos los archivos de la solución
-COPY *.sln ./
-COPY HolaMundoApp/*.csproj ./HolaMundoApp/
-COPY HolaMundoApp.Tests/*.csproj ./HolaMundoApp.Tests/
-
-# Restaurar dependencias
-RUN dotnet restore
-
-# Copiar todo el código fuente
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-
-# Construir la solución
-RUN dotnet build --no-restore -c Release
-
-# Etapa 2: runtime
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
-WORKDIR /app
-
-# Copiar la salida de build
-COPY --from=build /app/HolaMundoApp/bin/Release/net9.0/publish/ ./
-
-# Exponer puerto
-EXPOSE 80
-
-# Ejecutar la aplicación
-ENTRYPOINT ["dotnet", "HolaMundoApp.dll"]
+EXPOSE 5000
+CMD ["python", "app.py"]
